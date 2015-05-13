@@ -1,0 +1,12 @@
+image: blendle/dind-ruby:latest
+script:
+  - bundle install --jobs $(nproc) --retry 5
+  - wrapdocker bundle exec rake
+  - start-stop-daemon --stop --pidfile "/var/run/docker.pid"
+cache:
+  - /usr/local/bundle
+deploy:
+  bash:
+    command: curl -sSL --data "build=true" -X POST https://registry.hub.docker.com/u/blendle/aws-cli/trigger/$DOCKER_BUILD_TOKEN
+    when:
+      branch: master
